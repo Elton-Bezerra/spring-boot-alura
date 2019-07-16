@@ -18,6 +18,9 @@ import br.com.alura.forum.modelo.Topico;
 import br.com.alura.forum.repository.TopicoRepository;
 
 import javax.validation.Valid;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -32,15 +35,19 @@ public class TopicosController {
     CursoRepository cursoRepository;
 
     @GetMapping
-    public ResponseEntity<List<TopicoDTO>> lista(@RequestParam(name = "curso", required = false) String curso) {
-        List<Topico> topicos = new ArrayList<>(0);
+    public ResponseEntity<Page<TopicoDTO>> lista(
+            @RequestParam(name = "curso", required = false) String curso,
+            @RequestParam int page,
+            @RequestParam int size) {
+        Pageable paginacao = PageRequest.of(page, size); 
+        
         if (curso != null && !"".equals(curso)) {
-            topicos = repository.carregarPorNomeDoCurso(curso);
+            Page<Topico> topicos = repository.findByCursoNome(curso, paginacao);
+            return ResponseEntity.ok(TopicoDTO.converter(topicos));
         } else {
-            topicos = repository.findAll();
+            Page<Topico> topicos = repository.findAll(paginacao);
+            return ResponseEntity.ok(TopicoDTO.converter(topicos));
         }
-
-        return ResponseEntity.ok(TopicoDTO.converter(topicos));
     }
 
     @PostMapping
