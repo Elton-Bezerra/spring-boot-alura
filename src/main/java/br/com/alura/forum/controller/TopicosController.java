@@ -1,8 +1,6 @@
 package br.com.alura.forum.controller;
 
 import java.net.URI;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 
 import br.com.alura.forum.controller.form.AtualizacaoTopicoForm;
@@ -10,6 +8,8 @@ import br.com.alura.forum.controller.form.TopicoForm;
 import br.com.alura.forum.dto.DetalhesTopicoDTO;
 import br.com.alura.forum.repository.CursoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,7 +19,6 @@ import br.com.alura.forum.repository.TopicoRepository;
 
 import javax.validation.Valid;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -37,10 +36,12 @@ public class TopicosController {
     @GetMapping
     public ResponseEntity<Page<TopicoDTO>> lista(
             @RequestParam(name = "curso", required = false) String curso,
-            @RequestParam int page,
-            @RequestParam int size) {
-        Pageable paginacao = PageRequest.of(page, size); 
-        
+            @PageableDefault(
+                sort="id", direction = Sort.Direction.ASC,
+                page = 0,
+                size = 10
+            ) Pageable paginacao) {
+
         if (curso != null && !"".equals(curso)) {
             Page<Topico> topicos = repository.findByCursoNome(curso, paginacao);
             return ResponseEntity.ok(TopicoDTO.converter(topicos));
