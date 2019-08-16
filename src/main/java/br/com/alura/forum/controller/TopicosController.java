@@ -18,6 +18,7 @@ import br.com.alura.forum.modelo.Topico;
 import br.com.alura.forum.repository.TopicoRepository;
 
 import javax.validation.Valid;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -55,6 +56,7 @@ public class TopicosController {
 
     @PostMapping
     @Transactional
+    @CacheEvict(value="listaDeTopicos", allEntries = true)
     public ResponseEntity<TopicoDTO> cadastrar(@RequestBody @Valid TopicoForm form, UriComponentsBuilder uriBuilder) {
         Topico t = form.converter(cursoRepository);
         t = repository.save(t);
@@ -75,6 +77,7 @@ public class TopicosController {
 
     @PutMapping("/{id}")
     @Transactional
+    @CacheEvict(value="listaDeTopicos", allEntries = true)
     public ResponseEntity<TopicoDTO> atualizar(@PathVariable("id") Long id,
             @RequestBody @Valid AtualizacaoTopicoForm form) {
         Optional<Topico> topico = repository.findById(id);
@@ -88,6 +91,7 @@ public class TopicosController {
     
     @DeleteMapping("/{id}")
     @Transactional
+    @CacheEvict(value="listaDeTopicos", allEntries = true)
     public ResponseEntity<?> remover(@PathVariable("id")Long id) {
         Optional<Topico> topico = repository.findById(id);
         if(topico.isPresent()) {
