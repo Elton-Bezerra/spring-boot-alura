@@ -18,6 +18,7 @@ import br.com.alura.forum.modelo.Topico;
 import br.com.alura.forum.repository.TopicoRepository;
 
 import javax.validation.Valid;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,6 +35,7 @@ public class TopicosController {
     CursoRepository cursoRepository;
 
     @GetMapping
+    @Cacheable(value = "listaDeTopicos")
     public ResponseEntity<Page<TopicoDTO>> lista(
             @RequestParam(name = "curso", required = false) String curso,
             @PageableDefault(
